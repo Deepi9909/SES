@@ -1,4 +1,16 @@
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 export default function Home() {
+  useEffect(() => {
+    // Debug: Check if token exists when Home page loads
+    const token = localStorage.getItem('authToken');
+    console.log('Home page loaded. Token exists:', !!token);
+    if (token) {
+      console.log('Token preview:', token.substring(0, 50) + '...');
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <div className="max-w-xl w-full text-center">
@@ -12,18 +24,18 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/upload"
+          <Link
+            to="/upload"
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition"
           >
             Upload Documents
-          </a>
-          <a
-            href="/compare-chat"
+          </Link>
+          <Link
+            to="/compare-chat"
             className="bg-gray-100 text-blue-700 px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-200 transition"
           >
             Search / Chat
-          </a>
+          </Link>
         </div>
       </div>
     </div>
