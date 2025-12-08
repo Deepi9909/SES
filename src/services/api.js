@@ -12,6 +12,34 @@ function buildUrl(endpoint) {
   return `${API_BASE_URL}${endpoint}`;
 }
 
+// Helper function to get authentication headers
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log('Sending Authorization header with token:', token.substring(0, 20) + '...');
+  } else {
+    console.warn('No auth token found in localStorage');
+  }
+  
+  return headers;
+}
+
+// Helper function to handle authentication errors
+function handleAuthError(response) {
+  if (response.status === 401) {
+    // Token expired or invalid - clear auth and redirect to login
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userEmail');
+    window.location.href = '/login';
+  }
+}
+
 
 
 /**
@@ -64,10 +92,7 @@ export async function getUploadUrl(fileName, contentType, uniqueId = null, pathP
   const response = await fetch(buildUrl('/getUploadUrl'), {
     method: 'POST',
     mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       fileName: fullFileName,
       contentType,
@@ -78,6 +103,7 @@ export async function getUploadUrl(fileName, contentType, uniqueId = null, pathP
   console.log('Response status:', response.status);
   
   if (!response.ok) {
+    handleAuthError(response);
     const errorText = await response.text();
     console.error('Error response:', errorText);
     throw new Error('Failed to get upload URL');
@@ -132,9 +158,7 @@ export async function sendChatMessage(message, sessionId, fileUrls = []) {
   
   const response = await fetch(buildUrl('/contractQA'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       message,
       unique_id: sessionId,
@@ -146,6 +170,7 @@ export async function sendChatMessage(message, sessionId, fileUrls = []) {
   console.log('Chat response status:', response.status);
 
   if (!response.ok) {
+    handleAuthError(response);
     const errorText = await response.text();
     console.error('Chat error response:', errorText);
     throw new Error('Failed to send chat message');
@@ -164,9 +189,7 @@ export async function compareContracts(uniqueId) {
   
   const response = await fetch(buildUrl('/compareContracts'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       unique_id: uniqueId,
       event_type: 'compareContracts',
@@ -176,6 +199,7 @@ export async function compareContracts(uniqueId) {
   console.log('Compare response status:', response.status);
 
   if (!response.ok) {
+    handleAuthError(response);
     const errorText = await response.text();
     console.error('Compare error response:', errorText);
     throw new Error('Failed to compare contracts');
@@ -192,9 +216,7 @@ export async function compareContracts(uniqueId) {
 export async function getChatHistory(sessionId) {
   const response = await fetch(buildUrl(`/chat/history/${sessionId}`), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       session_id: sessionId,
       event_type: 'getChatHistory',
@@ -202,6 +224,7 @@ export async function getChatHistory(sessionId) {
   });
 
   if (!response.ok) {
+    handleAuthError(response);
     throw new Error('Failed to get chat history');
   }
 
@@ -214,9 +237,7 @@ export async function getChatHistory(sessionId) {
 export async function exportComparisonPDF(comparisonData) {
   const response = await fetch(buildUrl('/export/pdf'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       ...comparisonData,
       event_type: 'exportPDF',
@@ -224,6 +245,7 @@ export async function exportComparisonPDF(comparisonData) {
   });
 
   if (!response.ok) {
+    handleAuthError(response);
     throw new Error('Failed to export PDF');
   }
 
@@ -237,9 +259,7 @@ export async function exportComparisonPDF(comparisonData) {
 export async function exportComparisonCSV(comparisonData) {
   const response = await fetch(buildUrl('/export/csv'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       ...comparisonData,
       event_type: 'exportCSV',
@@ -247,6 +267,7 @@ export async function exportComparisonCSV(comparisonData) {
   });
 
   if (!response.ok) {
+    handleAuthError(response);
     throw new Error('Failed to export CSV');
   }
 

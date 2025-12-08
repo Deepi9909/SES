@@ -38,6 +38,12 @@ function Login() {
         response.token || response.access_token
       );
       
+      // Wait for localStorage to be updated before navigation
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Verify token was saved
+      console.log('Before navigation - token in storage:', localStorage.getItem('authToken') ? 'EXISTS' : 'MISSING');
+      
       // Redirect to home page
       navigate('/');
     } catch (err) {
