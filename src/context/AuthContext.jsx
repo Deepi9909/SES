@@ -21,10 +21,21 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData, token) => {
+    console.log('AuthContext.login called with:', { userData, token });
+    console.log('Token type:', typeof token);
+    console.log('Token value:', token);
+    
+    if (!token) {
+      console.error('No token provided to login function!');
+      return;
+    }
+    
     localStorage.setItem('authToken', token);
     localStorage.setItem('userEmail', userData.email);
     setIsAuthenticated(true);
     setUser(userData);
+    
+    console.log('Token saved to localStorage:', localStorage.getItem('authToken'));
   };
 
   const logout = () => {

@@ -27,6 +27,11 @@ function Login() {
       // Call the backend login API
       const response = await loginUser(email, password);
       
+      // Debug: Check what backend returns
+      console.log('Login response:', response);
+      console.log('Token:', response.token);
+      console.log('Access token:', response.access_token);
+      
       // Store token and user info using Auth context
       login(
         { email: response.user?.email || email },
