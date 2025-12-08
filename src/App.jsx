@@ -1,0 +1,60 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Sidebar from './components/Sidebar/Sidebar';
+import Topbar from './components/Topbar/Topbar';
+import Home from './pages/Home/Home';
+import DocumentUpload from './pages/DocumentUpload/DocumentUpload';
+import ContractCompareChat from './pages/ContractCompareChat/ContractCompareChat';
+import Login from './pages/Login/Login';
+
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public Route - Login */}
+      <Route 
+        path="/login" 
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <Login />
+        } 
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <div className="flex min-h-screen bg-gray-50">
+              <Sidebar />
+              <div className="flex-1 flex flex-col">
+                <Topbar />
+                <main className="flex-1 p-6">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/upload" element={<DocumentUpload />} />
+                    <Route path="/compare-chat" element={<ContractCompareChat />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </main>
+              </div>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;
