@@ -22,7 +22,12 @@ function getAuthHeaders() {
   
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-    console.log('Sending Authorization header with token:', token.substring(0, 20) + '...');
+    console.log('=== TOKEN DEBUG ===');
+    console.log('Full token from localStorage:', token);
+    console.log('Token length:', token.length);
+    console.log('Token parts (should be 3):', token.split('.').length);
+    console.log('Authorization header:', headers['Authorization']);
+    console.log('Header length:', headers['Authorization'].length);
   } else {
     console.warn('No auth token found in localStorage');
   }
