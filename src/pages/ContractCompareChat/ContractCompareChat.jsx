@@ -248,13 +248,32 @@ export default function ContractCompareChat() {
               </div>
             </div>
           </div>
-          <div className="mb-4">
+          <div className="mb-4 flex gap-4">
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleCompare}
-              disabled={!contractAUrl || !contractBUrl || comparing}
+              disabled={!contractAUrl || !contractBUrl || comparing || comparisonData}
             >
               {comparing ? 'Comparing...' : 'Compare Contracts'}
+            </button>
+            <button
+              className="bg-red-600 text-white px-6 py-2 rounded shadow hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => {
+                setContractA(null);
+                setContractB(null);
+                setContractAUrl(null);
+                setContractBUrl(null);
+                setComparisonData(null);
+                setComparing(false);
+                // Reset file inputs
+                const inputA = document.getElementById('contractA');
+                const inputB = document.getElementById('contractB');
+                if (inputA) inputA.value = '';
+                if (inputB) inputB.value = '';
+              }}
+              disabled={!contractA && !contractB && !comparisonData}
+            >
+              Clear All
             </button>
           </div>
           <div className="mb-4">
@@ -282,7 +301,7 @@ export default function ContractCompareChat() {
           )}
           {comparisonData && !comparing && (
             <>
-              <ComparisonTableDisplay data={comparisonData} />
+              <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} />
               <div className="flex gap-4 mt-6">
                 <button
                   className="bg-gray-100 text-blue-700 px-4 py-2 rounded shadow hover:bg-blue-200"

@@ -1,8 +1,26 @@
-export default function ComparisonTableDisplay({ data }) {
+export default function ComparisonTableDisplay({ data, viewMode = 'detailed' }) {
   if (!data) {
     return (
       <div className="bg-white rounded-lg shadow p-4 text-center text-gray-400">
         Upload and compare contracts to see results here.
+      </div>
+    );
+  }
+
+  // If viewMode is 'summary', show only the summary_part
+  if (viewMode === 'summary') {
+    return (
+      <div className="bg-white rounded-lg shadow p-4">
+        {data.summary_part ? (
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-blue-900">📋 Summary</h3>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{data.summary_part}</p>
+          </div>
+        ) : (
+          <div className="text-center text-gray-400">
+            No summary available.
+          </div>
+        )}
       </div>
     );
   }
@@ -25,14 +43,6 @@ export default function ComparisonTableDisplay({ data }) {
           }
           return null;
         })}
-        
-        {/* Display summary_part from backend */}
-        {data.summary_part && (
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-blue-900">📋 Summary</h3>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{data.summary_part}</p>
-          </div>
-        )}
       </div>
     );
   }

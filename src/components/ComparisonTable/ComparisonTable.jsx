@@ -126,7 +126,25 @@ export default function ComparisonTable() {
     }, 1500);
   };
 
+  // Clear all uploads and results
+  const handleClear = () => {
+    setContractA(null);
+    setContractB(null);
+    setContractAUrl(null);
+    setContractBUrl(null);
+    setErrorA(null);
+    setErrorB(null);
+    setShowTable(false);
+    setComparing(false);
+    // Reset file inputs
+    const inputA = document.getElementById('contractA');
+    const inputB = document.getElementById('contractB');
+    if (inputA) inputA.value = '';
+    if (inputB) inputB.value = '';
+  };
+
   const isCompareEnabled = contractAUrl !== null && contractBUrl !== null;
+  const isClearEnabled = contractA !== null || contractB !== null || showTable;
 
   return (
     <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
@@ -258,13 +276,21 @@ export default function ComparisonTable() {
         </div>
       </div>
       {/* Compare Contracts Button */}
-      <div className="mb-6">
+      <div className="mb-6 flex gap-4">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleCompare}
           disabled={!isCompareEnabled || comparing}
         >
           {comparing ? "Comparing..." : "Compare Contracts"}
+        </button>
+        
+        <button
+          className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleClear}
+          disabled={!isClearEnabled}
+        >
+          Clear All
         </button>
       </div>
       {comparing && (

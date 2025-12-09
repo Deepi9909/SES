@@ -70,9 +70,14 @@
   font-size: 0.9rem;
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
 .compare-button {
-  display: block;
-  margin: 0 auto;
   padding: 1rem 3rem;
   font-size: 1.1rem;
   background-color: #007bff;
@@ -88,6 +93,26 @@
 }
 
 .compare-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.clear-button {
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.clear-button:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.clear-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }

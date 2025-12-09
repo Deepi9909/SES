@@ -9,8 +9,11 @@ export function AuthProvider({ children }) {
 
   // Check authentication status on mount
   useEffect(() => {
+    console.log('AuthContext: Checking auth on mount');
     const token = localStorage.getItem('authToken');
     const userEmail = localStorage.getItem('userEmail');
+    
+    console.log('Token on mount:', token ? 'EXISTS' : 'MISSING');
     
     if (token && userEmail) {
       setIsAuthenticated(true);
@@ -18,7 +21,18 @@ export function AuthProvider({ children }) {
     }
     
     setIsLoading(false);
-  }, []);
+    
+    // Monitor localStorage changes
+    const interval = setInterval(() => {
+      const currentToken = localStorage.getItem('authToken');
+      if (!currentToken && isAuthenticated) {
+        console.error('⚠️ TOKEN WAS CLEARED! User was authenticated but token is now missing');
+        console.trace('Token disappeared');
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const login = (userData, token) => {
     console.log('AuthContext.login called with:', { userData, token });
@@ -39,6 +53,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    console.log('LOGOUT CALLED - Stack trace:', new Error().stack);
     localStorage.removeItem('authToken');
     localStorage.removeItem('userEmail');
     setIsAuthenticated(false);
