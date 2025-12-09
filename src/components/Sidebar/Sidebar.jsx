@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const menu = [
   { name: 'Home', path: '/', icon: '🏠' },
-  { name: 'Document Upload', path: '/upload', icon: '📤' },
+  // { name: 'Document Upload', path: '/upload', icon: '📤' },
   { name: 'Contract Search & Chat', path: '/compare-chat', icon: '🔍' },
 ];
 

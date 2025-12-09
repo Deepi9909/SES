@@ -115,11 +115,11 @@ export default function ContractCompareChat() {
     }
   };
 
-  const handleDownloadCSV = async () => {
+  const handleDownloadCSV = () => {
     if (!comparisonData) return;
 
     try {
-      const blob = await exportComparisonCSV(comparisonData);
+      const blob = exportComparisonCSV(comparisonData);
       downloadBlob(blob, 'contract-comparison.csv');
     } catch (error) {
       console.error('Failed to export CSV:', error);
