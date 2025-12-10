@@ -11,7 +11,7 @@ export default function ChatWindow() {
     {
       id: 1,
       role: "assistant",
-      content: "Hello! Upload your contracts (max 2) and ask me anything about them.",
+      content: "Welcome! Please upload your contract documents (PDF, DOC, DOCX, XLS, or XLSX format). You can upload up to 2 contracts to compare and analyze. Once uploaded, feel free to ask me questions about your contracts or compare them side-by-side.",
     },
   ]);
   const [inputMessage, setInputMessage] = useState("");
@@ -135,7 +135,7 @@ export default function ChatWindow() {
       {
         id: 1,
         role: "assistant",
-        content: "Hello! Upload your contracts (max 2) and ask me anything about them.",
+        content: "Welcome! Please upload your contract documents (PDF, DOC, DOCX, XLS, or XLSX format). You can upload up to 2 contracts to compare and analyze. Once uploaded, feel free to ask me questions about your contracts or compare them side-by-side.",
       },
     ]);
     setFiles([]);
