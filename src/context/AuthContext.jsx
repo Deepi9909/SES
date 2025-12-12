@@ -12,12 +12,13 @@ export function AuthProvider({ children }) {
     console.log('AuthContext: Checking auth on mount');
     const token = localStorage.getItem('authToken');
     const userEmail = localStorage.getItem('userEmail');
+    const userRole = localStorage.getItem('userRole');
     
     console.log('Token on mount:', token ? 'EXISTS' : 'MISSING');
     
     if (token && userEmail) {
       setIsAuthenticated(true);
-      setUser({ email: userEmail });
+      setUser({ email: userEmail, role: userRole });
     }
     
     setIsLoading(false);
@@ -36,8 +37,6 @@ export function AuthProvider({ children }) {
 
   const login = (userData, token) => {
     console.log('AuthContext.login called with:', { userData, token });
-    console.log('Token type:', typeof token);
-    console.log('Token value:', token);
     
     if (!token) {
       console.error('No token provided to login function!');
@@ -46,16 +45,20 @@ export function AuthProvider({ children }) {
     
     localStorage.setItem('authToken', token);
     localStorage.setItem('userEmail', userData.email);
+    if (userData.role) {
+      localStorage.setItem('userRole', userData.role);
+    }
     setIsAuthenticated(true);
     setUser(userData);
     
-    console.log('Token saved to localStorage:', localStorage.getItem('authToken'));
+    console.log('Login successful - User authenticated');
   };
 
   const logout = () => {
-    console.log('LOGOUT CALLED - Stack trace:', new Error().stack);
+    console.log('Logging out user');
     localStorage.removeItem('authToken');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
     setIsAuthenticated(false);
     setUser(null);
   };

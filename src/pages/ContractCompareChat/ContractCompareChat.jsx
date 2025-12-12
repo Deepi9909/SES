@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ChatWindow from '../../components/ChatWindow/ChatWindow';
 import MetadataPanel from '../../components/MetadataPanel/MetadataPanel';
 import ComparisonTableDisplay from '../../components/ComparisonTable/ComparisonTableDisplay';
 import { uploadFile, compareContracts, downloadBlob, exportComparisonPDF, exportComparisonCSV } from '../../services/api';
 
 export default function ContractCompareChat() {
+  const location = useLocation();
   const [mode, setMode] = useState('chat');
   const [contractA, setContractA] = useState(null);
   const [contractB, setContractB] = useState(null);
@@ -17,6 +19,13 @@ export default function ContractCompareChat() {
   const [viewMode, setViewMode] = useState('detailed');
   const [uniqueId, setUniqueId] = useState(null);
   const fileInputRef = useRef();
+
+  // Set initial mode based on navigation state
+  useEffect(() => {
+    if (location.state?.mode) {
+      setMode(location.state.mode);
+    }
+  }, [location.state]);
 
   const handleContractAUpload = async (e) => {
     const file = e.target.files[0];
@@ -131,16 +140,16 @@ export default function ContractCompareChat() {
     <div>
       <div className="sticky top-0 bg-white z-10 flex gap-4 items-center mb-6 p-2 rounded shadow">
         <button
-          className={`px-4 py-2 rounded font-semibold ${
-            mode === 'chat' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-blue-700'
+          className={`px-4 py-2 rounded font-semibold transition ${
+            mode === 'chat' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700 hover:bg-indigo-50'
           }`}
           onClick={() => setMode('chat')}
         >
           Chat with Documents
         </button>
         <button
-          className={`px-4 py-2 rounded font-semibold ${
-            mode === 'compare' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-blue-700'
+          className={`px-4 py-2 rounded font-semibold transition ${
+            mode === 'compare' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700 hover:bg-indigo-50'
           }`}
           onClick={() => setMode('compare')}
         >
@@ -148,13 +157,8 @@ export default function ContractCompareChat() {
         </button>
       </div>
       {mode === 'chat' ? (
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <ChatWindow />
-          </div>
-          <div className="w-full md:w-80">
-            <MetadataPanel collapsible />
-          </div>
+        <div className="w-full">
+          <ChatWindow />
         </div>
       ) : (
         <div>
@@ -172,14 +176,14 @@ export default function ContractCompareChat() {
                 />
                 <label htmlFor="contractA" className="cursor-pointer">
                   {uploadingA ? (
-                    <div className="text-sm text-blue-600">
+                    <div className="text-sm text-indigo-600">
                       <div className="text-3xl mb-2">⏳</div>
                       <div>Uploading...</div>
                     </div>
                   ) : contractA ? (
                     <div className="text-sm">
                       <div className="text-3xl mb-2">✅</div>
-                      <span className="text-blue-600 font-semibold">{contractA.name}</span>
+                      <span className="text-indigo-700 font-semibold">{contractA.name}</span>
                       <div className="mt-2">
                         <button
                           className="text-red-500 hover:underline"
@@ -216,14 +220,14 @@ export default function ContractCompareChat() {
                 />
                 <label htmlFor="contractB" className="cursor-pointer">
                   {uploadingB ? (
-                    <div className="text-sm text-blue-600">
+                    <div className="text-sm text-indigo-600">
                       <div className="text-3xl mb-2">⏳</div>
                       <div>Uploading...</div>
                     </div>
                   ) : contractB ? (
                     <div className="text-sm">
                       <div className="text-3xl mb-2">✅</div>
-                      <span className="text-blue-600 font-semibold">{contractB.name}</span>
+                      <span className="text-indigo-700 font-semibold">{contractB.name}</span>
                       <div className="mt-2">
                         <button
                           className="text-red-500 hover:underline"
@@ -250,7 +254,7 @@ export default function ContractCompareChat() {
           </div>
           <div className="mb-4 flex gap-4">
             <button
-              className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-indigo-600 text-white px-6 py-2 rounded shadow hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
               onClick={handleCompare}
               disabled={!contractAUrl || !contractBUrl || comparing || comparisonData}
             >
@@ -304,13 +308,13 @@ export default function ContractCompareChat() {
               <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} />
               <div className="flex gap-4 mt-6">
                 <button
-                  className="bg-gray-100 text-blue-700 px-4 py-2 rounded shadow hover:bg-blue-200"
+                  className="bg-gray-100 text-indigo-700 px-4 py-2 rounded shadow hover:bg-indigo-50 transition"
                   onClick={handleDownloadPDF}
                 >
                   Download PDF
                 </button>
                 <button
-                  className="bg-gray-100 text-blue-700 px-4 py-2 rounded shadow hover:bg-blue-200"
+                  className="bg-gray-100 text-indigo-700 px-4 py-2 rounded shadow hover:bg-indigo-50 transition"
                   onClick={handleDownloadCSV}
                 >
                   Download CSV
