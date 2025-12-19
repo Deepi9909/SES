@@ -1,5 +1,5 @@
 // API Base URL - update this to your backend URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://witty-mud-0a15b6e0f.3.azurestaticapps.net';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://happy-wave-0caccda03.3.azurestaticapps.net';
 
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
