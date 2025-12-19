@@ -1,5 +1,5 @@
 // API Base URL - update this to your backend URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://happy-wave-0caccda03.3.azurestaticapps.net/login';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://vmp-orchestrator-dcb9cwewandtcha9.westeurope-01.azurewebsites.net/api/http_trigger1?code=xlJ8uVojpg9N3RoGEudOmbYy6lS6OcvwQRXtVocNbuVAAzFu7euajA==';
 
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
