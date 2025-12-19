@@ -1,0 +1,14 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureStaticWebApp@0
+  inputs:
+    app_location: "/"          # root folder
+    api_location: ""            # empty if no backend
+    output_location: "build"    # React → build
+  env:
+    azure_static_web_apps_api_token: $898e0dd6b37342bc53724c067e2bd316360689016806cd5dc3119c2ab8942a6d03-4c55b958-1ab3-42d4-b08f-aa44f420968600320230caccda03
