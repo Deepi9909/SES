@@ -1,9 +1,7 @@
-variables:
-- group: swa-secrets
-
 trigger:
 - main
-
+variables:
+- group: swa-secrets
 pool:
   vmImage: ubuntu-latest
 
