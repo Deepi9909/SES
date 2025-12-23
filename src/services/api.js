@@ -1,15 +1,11 @@
 // API Base URL - update this to your backend URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://witty-mud-0a15b6e0f.3.azurestaticapps.net';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://fnc-vmp-weu1-p-001-f7bmd9cze3had9hv.westeurope-01.azurewebsites.net/api/vmp_func_app';
 
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
-  // If API_BASE_URL already contains query params (Azure Function with code), 
-  // just return the base URL since routing is handled by event_type parameter
-  if (API_BASE_URL.includes('?')) {
-    return API_BASE_URL;
-  }
-  // Otherwise, append the endpoint path normally (for local development)
-  return `${API_BASE_URL}${endpoint}`;
+  // Azure Function uses event_type parameter for routing, not URL paths
+  // Always return just the base URL
+  return API_BASE_URL;
 }
 
 // Helper function to get authentication headers
