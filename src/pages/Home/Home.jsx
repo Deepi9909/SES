@@ -7,7 +7,7 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-full bg-white flex flex-col">
+    <div className="min-h-full bg-white/50 backdrop-blur-sm flex flex-col">
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="max-w-7xl mx-auto w-full">

@@ -43,8 +43,21 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-md w-full mx-4 flex flex-col">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Background Image with Overlay and Blur */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url('/images/login-bg.jpg')`,
+          filter: 'blur(2px)',
+          transform: 'scale(1.1)', // Prevents blur edge artifacts
+        }}
+      />
+      {/* Dark Overlay for Better Readability */}
+      <div className="absolute inset-0 bg-black/40" />
+      
+      {/* Content Container */}
+      <div className="max-w-md w-full mx-4 flex flex-col relative z-10">
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col">
           {/* Logo/Title Section */}
@@ -157,7 +170,7 @@ function Login() {
           </div>
         </div>
         {/* Footer */}
-        <p className="mt-8 text-center text-sm text-gray-600">
+        <p className="mt-8 text-center text-sm text-white drop-shadow-lg">
           © 2025 VMP. All rights reserved.
         </p>
       </div>

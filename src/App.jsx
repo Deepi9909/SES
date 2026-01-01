@@ -26,18 +26,24 @@ function AppContent() {
         path="/*"
         element={
           <ProtectedRoute>
-            <div className="flex flex-col min-h-screen bg-white">
-              <Topbar />
-              <div className="flex flex-1">
-                <Sidebar />
-                <main className="flex-1 p-6">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/upload" element={<DocumentUpload />} />
-                    <Route path="/compare-chat" element={<ContractCompareChat />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </main>
+            <div className="flex flex-col min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative" style={{ backgroundImage: "url('/images/login-bg.jpg')" }}>
+              {/* Subtle overlay for readability */}
+              <div className="absolute inset-0 bg-white/40 z-0"></div>
+              
+              {/* Content layer */}
+              <div className="relative z-10 flex flex-col min-h-screen">
+                <Topbar />
+                <div className="flex flex-1">
+                  <Sidebar />
+                  <main className="flex-1 p-6">
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/upload" element={<DocumentUpload />} />
+                      <Route path="/compare-chat" element={<ContractCompareChat />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </main>
+                </div>
               </div>
             </div>
           </ProtectedRoute>
