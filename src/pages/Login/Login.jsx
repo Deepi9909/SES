@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../../config/authConfig';
 import { useAuth } from '../../context/AuthContext';
 import { loginUser } from '../../services/api';
 
@@ -10,6 +12,28 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { instance } = useMsal();
+
+  const handleAzureLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const loginResponse = await instance.loginPopup(loginRequest);
+      console.log('Azure AD login successful:', loginResponse);
+      
+      // You can store additional user info if needed
+      if (loginResponse.account) {
+        localStorage.setItem('userRole', 'user'); // Set default role or fetch from your backend
+      }
+      
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('Azure AD login error:', err);
+      setError('Failed to sign in with Microsoft. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -157,7 +181,9 @@ function Login() {
             </div>
             <button
               type="button"
-              className="flex items-center justify-center mt-4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+              onClick={handleAzureLogin}
+              disabled={isLoading}
+              className="flex items-center justify-center mt-4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <rect x="2" y="2" width="9.5" height="9.5" fill="#F25022"/>
@@ -165,7 +191,7 @@ function Login() {
                 <rect x="2" y="12.5" width="9.5" height="9.5" fill="#00A4EF"/>
                 <rect x="12.5" y="12.5" width="9.5" height="9.5" fill="#FFB900"/>
               </svg>
-              Microsoft
+              Sign in with Microsoft
             </button>
           </div>
         </div>

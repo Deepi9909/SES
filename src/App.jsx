@@ -26,9 +26,9 @@ function AppContent() {
         path="/*"
         element={
           <ProtectedRoute>
-            <div className="flex flex-col min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative" style={{ backgroundImage: "url('/images/login-bg.jpg')" }}>
+            <div className="flex flex-col min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative" style={{ backgroundImage: "url('/images/app-bg.jpg')" }}>
               {/* Subtle overlay for readability */}
-              <div className="absolute inset-0 bg-white/40 z-0"></div>
+              <div className="absolute inset-0 bg-white/20 z-0"></div>
               
               {/* Content layer */}
               <div className="relative z-10 flex flex-col min-h-screen">
