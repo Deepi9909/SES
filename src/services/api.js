@@ -1,6 +1,6 @@
 // API Base URL - update this to your backend URL
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://fnc-vmp-weu1-p-001-f7bmd9cze3had9hv.westeurope-01.azurewebsites.net/api/vmp_func_app';
-
+// https://fnc-vmp-weu1-p-001-f7bmd9cze3had9hv.westeurope-01.azurewebsites.net/api/vmp_func_app
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
   // Azure Function uses event_type parameter for routing, not URL paths
