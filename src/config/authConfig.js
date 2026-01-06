@@ -5,13 +5,6 @@
  * for Azure AD authentication.
  */
 
-// Debug: Log environment variables
-console.log('=== MSAL Configuration Debug ===');
-console.log('REACT_APP_AZURE_AD_CLIENT_ID:', process.env.REACT_APP_AZURE_AD_CLIENT_ID);
-console.log('REACT_APP_AZURE_AD_TENANT_ID:', process.env.REACT_APP_AZURE_AD_TENANT_ID);
-console.log('REACT_APP_AZURE_AD_REDIRECT_URI:', process.env.REACT_APP_AZURE_AD_REDIRECT_URI);
-console.log('window.location.origin:', window.location.origin);
-
 export const msalConfig = {
   auth: {
     clientId: process.env.REACT_APP_AZURE_AD_CLIENT_ID || '',
@@ -31,31 +24,19 @@ export const msalConfig = {
         }
         switch (level) {
           case 0: // LogLevel.Error
-            console.error('[MSAL Error]', message);
+            console.error('[MSAL]', message);
             return;
           case 1: // LogLevel.Warning
-            console.warn('[MSAL Warning]', message);
-            return;
-          case 2: // LogLevel.Info
-            console.info('[MSAL Info]', message);
-            return;
-          case 3: // LogLevel.Verbose
-            console.debug('[MSAL Verbose]', message);
+            console.warn('[MSAL]', message);
             return;
           default:
             return;
         }
       },
-      logLevel: 3, // Set to Verbose for detailed logging
+      logLevel: 1, // Warning and Error only
     },
   },
 };
-
-// Debug: Log the final configuration
-console.log('=== Final MSAL Config ===');
-console.log('clientId:', msalConfig.auth.clientId);
-console.log('authority:', msalConfig.auth.authority);
-console.log('redirectUri:', msalConfig.auth.redirectUri);
 
 /**
  * Scopes you add here will be prompted for user consent during sign-in.

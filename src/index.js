@@ -5,10 +5,6 @@ import { PublicClientApplication, EventType } from '@azure/msal-browser';
 import { msalConfig } from './config/authConfig';
 import './tailwind.css';
 import App from './App';
-import { setupNetworkLogging } from './utils/networkLogger';
-
-// Enable network request logging
-setupNetworkLogging();
 
 // Initialize MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
