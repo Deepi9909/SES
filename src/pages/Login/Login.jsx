@@ -25,11 +25,7 @@ function Login() {
     console.log('MSAL Instance:', instance);
     console.log('Login Request:', loginRequest);
     console.log('Current Accounts:', instance.getAllAccounts());
-    console.log('Configuration:', {
-      clientId: instance.config.auth.clientId,
-      authority: instance.config.auth.authority,
-      redirectUri: instance.config.auth.redirectUri,
-    });
+    console.log('Active Account:', instance.getActiveAccount());
     console.log('========================================');
     
     try {
