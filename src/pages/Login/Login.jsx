@@ -17,12 +17,41 @@ function Login() {
   const handleAzureLogin = async () => {
     setIsLoading(true);
     setError("");
+    
+    console.log('========================================');
+    console.log('🔐 AZURE LOGIN INITIATED');
+    console.log('========================================');
+    console.log('Time:', new Date().toISOString());
+    console.log('MSAL Instance:', instance);
+    console.log('Login Request:', loginRequest);
+    console.log('Current Accounts:', instance.getAllAccounts());
+    console.log('Configuration:', {
+      clientId: instance.config.auth.clientId,
+      authority: instance.config.auth.authority,
+      redirectUri: instance.config.auth.redirectUri,
+    });
+    console.log('========================================');
+    
     try {
+      console.log('▶️ Calling instance.loginRedirect()...');
+      console.log('Scopes requested:', loginRequest.scopes);
+      
       // Use redirect instead of popup to avoid COOP issues on Azure Static Web Apps
       await instance.loginRedirect(loginRequest);
+      
       // Note: Code after loginRedirect won't execute as the page redirects
+      console.log('⚠️ This line should not execute - page should have redirected');
     } catch (err) {
-      console.error('Azure AD login error:', err);
+      console.error('========================================');
+      console.error('❌ AZURE AD LOGIN ERROR');
+      console.error('========================================');
+      console.error('Error Type:', err.name);
+      console.error('Error Message:', err.message);
+      console.error('Error Code:', err.errorCode);
+      console.error('Error Stack:', err.stack);
+      console.error('Full Error Object:', err);
+      console.error('========================================');
+      
       setError('Failed to sign in with Microsoft. Please try again.');
       setIsLoading(false);
     }
