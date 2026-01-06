@@ -84,7 +84,7 @@ export function AuthProvider({ children }) {
     // If Azure AD user, logout from Azure AD
     if (user?.authType === 'azure-ad' && accounts.length > 0) {
       try {
-        await instance.logoutPopup({
+        await instance.logoutRedirect({
           account: accounts[0],
         });
       } catch (error) {

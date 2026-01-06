@@ -18,19 +18,12 @@ function Login() {
     setIsLoading(true);
     setError("");
     try {
-      const loginResponse = await instance.loginPopup(loginRequest);
-      console.log('Azure AD login successful:', loginResponse);
-      
-      // You can store additional user info if needed
-      if (loginResponse.account) {
-        localStorage.setItem('userRole', 'user'); // Set default role or fetch from your backend
-      }
-      
-      navigate('/', { replace: true });
+      // Use redirect instead of popup to avoid COOP issues on Azure Static Web Apps
+      await instance.loginRedirect(loginRequest);
+      // Note: Code after loginRedirect won't execute as the page redirects
     } catch (err) {
       console.error('Azure AD login error:', err);
       setError('Failed to sign in with Microsoft. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
