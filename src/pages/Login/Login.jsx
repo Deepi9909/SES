@@ -14,15 +14,33 @@ function Login() {
   const { login } = useAuth();
   const { instance } = useMsal();
 
-  const handleAzureLogin = async () => {
+  const handleAzureLogin = async (e) => {
+    // Prevent any default behavior
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    console.log('========================================');
+    console.log('🔐 handleAzureLogin called');
+    console.log('MSAL instance exists:', !!instance);
+    console.log('loginRequest:', loginRequest);
+    console.log('========================================');
+    
     setIsLoading(true);
     setError("");
     
     try {
-      console.log('🔐 Initiating Azure AD login...');
+      console.log('▶️ About to call loginRedirect...');
       await instance.loginRedirect(loginRequest);
+      console.log('⚠️ This line should NOT execute - page should redirect');
     } catch (err) {
-      console.error('❌ Azure AD login error:', err.message);
+      console.error('========================================');
+      console.error('❌ Azure AD login error');
+      console.error('Error:', err);
+      console.error('Error message:', err.message);
+      console.error('Error stack:', err.stack);
+      console.error('========================================');
       setError('Failed to sign in with Microsoft. Please try again.');
       setIsLoading(false);
     }

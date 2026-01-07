@@ -17,6 +17,8 @@ msalInstance.initialize().then(async () => {
   console.log('Has redirect params:', window.location.search.includes('code') || window.location.search.includes('error'));
   console.log('========================================');
   
+  let authError = null;
+  
   // Set up event callbacks for authentication events
   msalInstance.addEventCallback((event) => {
     console.log('📢 MSAL EVENT:', event.eventType);
@@ -30,6 +32,7 @@ msalInstance.initialize().then(async () => {
     if (event.eventType === EventType.LOGIN_FAILURE) {
       console.error('❌ Login failed:', event.error);
       console.error('Error details:', event.error?.errorMessage);
+      authError = event.error;
     }
   });
 
@@ -52,7 +55,12 @@ msalInstance.initialize().then(async () => {
     console.error('❌ Authentication error:', error);
     console.error('Error code:', error.errorCode);
     console.error('Error message:', error.errorMessage);
+    console.error('Error description:', error.errorMessage);
     console.error('========================================');
+    authError = error;
+    
+    // Show error to user
+    alert(`Authentication failed:\n\n${error.errorCode}\n\n${error.errorMessage}\n\nPlease contact your administrator.`);
   }
 
   // Set active account if available
