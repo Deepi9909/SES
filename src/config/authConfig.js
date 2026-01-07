@@ -11,12 +11,14 @@ export const msalConfig = {
     authority: `https://login.microsoftonline.com/${process.env.REACT_APP_AZURE_AD_TENANT_ID || 'common'}`,
     redirectUri: process.env.REACT_APP_AZURE_AD_REDIRECT_URI || window.location.origin,
     postLogoutRedirectUri: process.env.REACT_APP_AZURE_AD_REDIRECT_URI || window.location.origin,
+    navigateToLoginRequestUrl: false, // Prevent double navigation
   },
   cache: {
-    cacheLocation: 'localStorage', // This configures where your cache will be stored
-    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
+    cacheLocation: 'localStorage',
+    storeAuthStateInCookie: false,
   },
   system: {
+    allowRedirectInIframe: false,
     loggerOptions: {
       loggerCallback: (level, message, containsPii) => {
         if (containsPii) {
@@ -33,7 +35,7 @@ export const msalConfig = {
             return;
         }
       },
-      logLevel: 1, // Warning and Error only
+      logLevel: 1,
     },
   },
 };
