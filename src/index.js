@@ -2,12 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication, EventType } from '@azure/msal-browser';
-import { msalConfig } from './config/authConfig';
+import { getMsalConfig } from './config/authConfig';
 import './tailwind.css';
 import App from './App';
 
-// Initialize MSAL instance
-const msalInstance = new PublicClientApplication(msalConfig);
+// Initialize MSAL instance with runtime config
+getMsalConfig().then(async (msalConfig) => {
+  console.log('========================================');
+  console.log('🔧 MSAL Configuration loaded');
+  console.log('Client ID:', msalConfig.auth.clientId ? `${msalConfig.auth.clientId.substring(0, 8)}...` : 'MISSING ❌');
+  console.log('Authority:', msalConfig.auth.authority);
+  console.log('Redirect URI:', msalConfig.auth.redirectUri);
+  console.log('========================================');
+
+  if (!msalConfig.auth.clientId) {
+    console.error('❌ CRITICAL: Client ID is missing!');
+    alert('Azure AD Client ID is not configured. Please check your configuration.');
+    return;
+  }
+
+  const msalInstance = new PublicClientApplication(msalConfig);
 
 // Initialize MSAL and handle authentication
 msalInstance.initialize().then(async () => {
@@ -78,4 +92,8 @@ msalInstance.initialize().then(async () => {
       </MsalProvider>
     </React.StrictMode>
   );
+});
+}).catch(error => {
+  console.error('Failed to initialize MSAL:', error);
+  alert('Failed to load authentication configuration. Please refresh the page.');
 });

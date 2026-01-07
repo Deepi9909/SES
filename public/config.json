@@ -1,0 +1,7 @@
+{
+  "azureAd": {
+    "clientId": "9d19a3fb-5c37-4bcf-a33b-acdb666de37b",
+    "tenantId": "88281ca8-e525-4a8d-b965-480a7ac2b970",
+    "redirectUri": "https://blue-mud-07ca9ca03.4.azurestaticapps.net"
+  }
+}

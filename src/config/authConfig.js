@@ -5,6 +5,60 @@
  * for Azure AD authentication.
  */
 
+import { loadRuntimeConfig } from './runtimeConfig';
+
+// This will be initialized asynchronously
+let runtimeConfig = null;
+
+// Initialize runtime config
+loadRuntimeConfig().then(config => {
+  runtimeConfig = config;
+}).catch(err => {
+  console.error('Failed to load runtime configuration:', err);
+});
+
+export const getMsalConfig = async () => {
+  if (!runtimeConfig) {
+    runtimeConfig = await loadRuntimeConfig();
+  }
+
+  return {
+    auth: {
+      clientId: runtimeConfig.clientId,
+      authority: `https://login.microsoftonline.com/${runtimeConfig.tenantId}`,
+      redirectUri: runtimeConfig.redirectUri,
+      postLogoutRedirectUri: runtimeConfig.redirectUri,
+      navigateToLoginRequestUrl: false,
+    },
+    cache: {
+      cacheLocation: 'localStorage',
+      storeAuthStateInCookie: false,
+    },
+    system: {
+      allowRedirectInIframe: false,
+      loggerOptions: {
+        loggerCallback: (level, message, containsPii) => {
+          if (containsPii) {
+            return;
+          }
+          switch (level) {
+            case 0: // LogLevel.Error
+              console.error('[MSAL]', message);
+              return;
+            case 1: // LogLevel.Warning
+              console.warn('[MSAL]', message);
+              return;
+            default:
+              return;
+          }
+        },
+        logLevel: 1,
+      },
+    },
+  };
+};
+
+// Legacy export for backward compatibility (will be empty initially)
 export const msalConfig = {
   auth: {
     clientId: process.env.REACT_APP_AZURE_AD_CLIENT_ID || '',
