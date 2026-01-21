@@ -1,8 +1,9 @@
 // API Base URL - loaded from environment variable
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL_DEV;
+
 
 if (!API_BASE_URL) {
-  console.error('REACT_APP_API_URL is not set in environment variables');
+  console.error('REACT_APP_API_URL_DEV is not set in environment variables');
 }
 
 // Helper function to build API endpoint URL
