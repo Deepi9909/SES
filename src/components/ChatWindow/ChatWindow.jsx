@@ -40,6 +40,35 @@ export default function ChatWindow() {
     };
   }, [sessionId, filesUploaded]);
 
+  // Cleanup session on page refresh/close
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (sessionId && filesUploaded) {
+        console.log('Page unloading, clearing chat session:', sessionId);
+        // Use navigator.sendBeacon for reliable cleanup on page unload
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem('authToken');
+        const data = JSON.stringify({
+          unique_id: sessionId,
+          event_type: 'clearSession',
+        });
+        
+        // sendBeacon is more reliable for page unload
+        const blob = new Blob([data], { type: 'application/json' });
+        navigator.sendBeacon(apiUrl, blob);
+        
+        // Also clear from localStorage
+        localStorage.removeItem('activeChatSession');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [sessionId, filesUploaded]);
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 

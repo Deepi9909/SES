@@ -51,15 +51,48 @@ export default function ContractCompareChat() {
     }
   }, [mode, prevMode, uniqueId]);
 
-  // Cleanup compare session on component unmount
+  // Cleanup compare session on component unmount only
   useEffect(() => {
+    const currentUniqueId = uniqueId;
+    const currentMode = mode;
+    const hasFiles = contractAUrl || contractBUrl;
+    
     return () => {
-      if (mode === 'compare' && uniqueId && (contractAUrl || contractBUrl)) {
-        console.log('ContractCompareChat unmounting, clearing compare session:', uniqueId);
-        clearSession(uniqueId).catch(err => {
+      if (currentMode === 'compare' && currentUniqueId && hasFiles) {
+        console.log('ContractCompareChat unmounting, clearing compare session:', currentUniqueId);
+        clearSession(currentUniqueId).catch(err => {
           console.error('Failed to clear compare session on unmount:', err);
         });
       }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only runs on mount/unmount
+
+  // Cleanup compare session on page refresh/close
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (mode === 'compare' && uniqueId && (contractAUrl || contractBUrl)) {
+        console.log('Page unloading, clearing compare session:', uniqueId);
+        // Use navigator.sendBeacon for reliable cleanup on page unload
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const data = JSON.stringify({
+          unique_id: uniqueId,
+          event_type: 'clearSession',
+        });
+        
+        // sendBeacon is more reliable for page unload
+        const blob = new Blob([data], { type: 'application/json' });
+        navigator.sendBeacon(apiUrl, blob);
+        
+        // Also clear from localStorage
+        localStorage.removeItem('activeCompareSession');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [mode, uniqueId, contractAUrl, contractBUrl]);
 
