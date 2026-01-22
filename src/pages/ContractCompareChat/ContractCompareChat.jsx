@@ -53,20 +53,17 @@ export default function ContractCompareChat() {
 
   // Cleanup compare session on component unmount only
   useEffect(() => {
-    const currentUniqueId = uniqueId;
-    const currentMode = mode;
-    const hasFiles = contractAUrl || contractBUrl;
-    
     return () => {
-      if (currentMode === 'compare' && currentUniqueId && hasFiles) {
-        console.log('ContractCompareChat unmounting, clearing compare session:', currentUniqueId);
-        clearSession(currentUniqueId).catch(err => {
+      if (mode === 'compare' && uniqueId && (contractAUrl || contractBUrl)) {
+        console.log('ContractCompareChat unmounting, clearing compare session:', uniqueId);
+        clearSession(uniqueId).catch(err => {
           console.error('Failed to clear compare session on unmount:', err);
         });
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - only runs on mount/unmount
+  // This intentionally only runs on unmount - dependencies are captured in closure
+  // eslint-disable-next-line
+  }, []);
 
   // Cleanup compare session on page refresh/close
   useEffect(() => {
