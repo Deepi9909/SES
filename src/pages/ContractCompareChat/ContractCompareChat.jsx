@@ -3,11 +3,12 @@ import { useLocation } from 'react-router-dom';
 import ChatWindow from '../../components/ChatWindow/ChatWindow';
 import MetadataPanel from '../../components/MetadataPanel/MetadataPanel';
 import ComparisonTableDisplay from '../../components/ComparisonTable/ComparisonTableDisplay';
-import { uploadFile, compareContracts, downloadBlob, exportComparisonPDF, exportComparisonCSV } from '../../services/api';
+import { uploadFile, compareContracts, downloadBlob, exportComparisonPDF, exportComparisonCSV, clearSession } from '../../services/api';
 
 export default function ContractCompareChat() {
   const location = useLocation();
   const [mode, setMode] = useState('chat');
+  const [prevMode, setPrevMode] = useState('chat');
   const [contractA, setContractA] = useState(null);
   const [contractB, setContractB] = useState(null);
   const [contractAUrl, setContractAUrl] = useState(null);
@@ -27,6 +28,41 @@ export default function ContractCompareChat() {
     }
   }, [location.state]);
 
+  // Clear session when switching modes
+  useEffect(() => {
+    if (prevMode !== mode) {
+      // Switching from compare to chat - clear compare session
+      if (prevMode === 'compare' && uniqueId) {
+        console.log('Switching from compare to chat, clearing compare session:', uniqueId);
+        clearSession(uniqueId).catch(err => {
+          console.error('Failed to clear compare session:', err);
+        });
+        // Reset compare state
+        setContractA(null);
+        setContractB(null);
+        setContractAUrl(null);
+        setContractBUrl(null);
+        setComparisonData(null);
+        setComparing(false);
+        setUniqueId(null);
+      }
+      
+      setPrevMode(mode);
+    }
+  }, [mode, prevMode, uniqueId]);
+
+  // Cleanup compare session on component unmount
+  useEffect(() => {
+    return () => {
+      if (mode === 'compare' && uniqueId && (contractAUrl || contractBUrl)) {
+        console.log('ContractCompareChat unmounting, clearing compare session:', uniqueId);
+        clearSession(uniqueId).catch(err => {
+          console.error('Failed to clear compare session on unmount:', err);
+        });
+      }
+    };
+  }, [mode, uniqueId, contractAUrl, contractBUrl]);
+
   const handleContractAUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -35,6 +71,8 @@ export default function ContractCompareChat() {
     const currentUniqueId = uniqueId || Date.now().toString();
     if (!uniqueId) {
       setUniqueId(currentUniqueId);
+      // Store session ID in localStorage for cleanup on logout
+      localStorage.setItem('activeCompareSession', currentUniqueId);
       console.log('Generated unique_id:', currentUniqueId);
     }
 
@@ -64,6 +102,8 @@ export default function ContractCompareChat() {
     const currentUniqueId = uniqueId || Date.now().toString();
     if (!uniqueId) {
       setUniqueId(currentUniqueId);
+      // Store session ID in localStorage for cleanup on logout
+      localStorage.setItem('activeCompareSession', currentUniqueId);
       console.log('Generated unique_id:', currentUniqueId);
     }
 
@@ -158,7 +198,7 @@ export default function ContractCompareChat() {
       </div>
       {mode === 'chat' ? (
         <div className="w-full">
-          <ChatWindow />
+          <ChatWindow key={mode} />
         </div>
       ) : (
         <div>
@@ -262,13 +302,27 @@ export default function ContractCompareChat() {
             </button>
             <button
               className="bg-red-600 text-white px-6 py-2 rounded shadow hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => {
+              onClick={async () => {
+                // Clear session data if session exists
+                if (uniqueId) {
+                  console.log('Clearing session data for session:', uniqueId);
+                  try {
+                    await clearSession(uniqueId);
+                    localStorage.removeItem('activeCompareSession');
+                    console.log('Session data cleared successfully');
+                  } catch (error) {
+                    console.error('Failed to clear session data:', error);
+                    // Continue with clearing even if deletion fails
+                  }
+                }
+                
                 setContractA(null);
                 setContractB(null);
                 setContractAUrl(null);
                 setContractBUrl(null);
                 setComparisonData(null);
                 setComparing(false);
+                setUniqueId(null);
                 // Reset file inputs
                 const inputA = document.getElementById('contractA');
                 const inputB = document.getElementById('contractB');

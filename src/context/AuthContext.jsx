@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
+import { clearSession } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -75,6 +76,26 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     console.log('Logging out user');
+    
+    // Clear any active sessions from localStorage
+    try {
+      const sessionKeys = Object.keys(localStorage).filter(key => 
+        key.startsWith('chatSession_') || key === 'activeCompareSession'
+      );
+      
+      for (const key of sessionKeys) {
+        const sessionId = localStorage.getItem(key);
+        if (sessionId) {
+          console.log('Clearing session on logout:', sessionId);
+          clearSession(sessionId).catch(err => {
+            console.error('Failed to clear session on logout:', err);
+          });
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (error) {
+      console.error('Error clearing sessions on logout:', error);
+    }
     
     // Clear traditional auth
     localStorage.removeItem('authToken');

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { uploadFile, sendChatMessage } from "../../services/api";
+import { uploadFile, sendChatMessage, clearSession } from "../../services/api";
 import React from "react";
 
 export default function ChatWindow() {
@@ -27,6 +27,18 @@ export default function ChatWindow() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Cleanup session on component unmount
+  useEffect(() => {
+    return () => {
+      if (sessionId && filesUploaded) {
+        console.log('ChatWindow unmounting, clearing session:', sessionId);
+        clearSession(sessionId).catch(err => {
+          console.error('Failed to clear session on unmount:', err);
+        });
+      }
+    };
+  }, [sessionId, filesUploaded]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -69,7 +81,20 @@ export default function ChatWindow() {
     }
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
+    // Clear session data if session exists
+    if (sessionId) {
+      console.log('Clearing session data for session:', sessionId);
+      try {
+        await clearSession(sessionId);
+        localStorage.removeItem('activeChatSession');
+        console.log('Session data cleared successfully');
+      } catch (error) {
+        console.error('Failed to clear session data:', error);
+        // Continue with clearing even if deletion fails
+      }
+    }
+    
     setMessages([
       {
         id: 1,
@@ -154,10 +179,28 @@ export default function ChatWindow() {
     setFiles(selectedFiles);
 
     let currentSessionId = sessionId;
+    let oldSessionId = null;
+    
     if (!currentSessionId || filesUploaded) {
+      // Store old session ID before creating new one
+      if (sessionId && filesUploaded) {
+        oldSessionId = sessionId;
+      }
+      
       currentSessionId = Date.now().toString();
       setSessionId(currentSessionId);
+      // Store session ID in localStorage for cleanup on logout
+      localStorage.setItem('activeChatSession', currentSessionId);
       console.log('Starting new session:', currentSessionId);
+      
+      // Clear old session in background if exists
+      if (oldSessionId) {
+        console.log('Clearing old session:', oldSessionId);
+        clearSession(oldSessionId).catch(err => {
+          console.error('Failed to clear old session:', err);
+        });
+      }
+      
       setMessages([
         {
           id: 1,
@@ -210,7 +253,19 @@ export default function ChatWindow() {
     setFiles([]);
   };
 
-  const handleNewUpload = () => {
+  const handleNewUpload = async () => {
+    // Clear previous session data if exists
+    if (sessionId && filesUploaded) {
+      console.log('Clearing previous session:', sessionId);
+      try {
+        await clearSession(sessionId);
+        console.log('Previous session cleared successfully');
+      } catch (error) {
+        console.error('Failed to clear previous session:', error);
+        // Continue with new upload even if deletion fails
+      }
+    }
+    
     setUploadStatus('default');
     setUploadProgress(0);
     setUploadError('');
