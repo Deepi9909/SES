@@ -2,6 +2,7 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL_DEV;
 
 
+
 if (!API_BASE_URL) {
   console.error('REACT_APP_API_URL_DEV is not set in environment variables');
 }
@@ -184,6 +185,37 @@ export async function sendChatMessage(message, sessionId, fileUrls = []) {
 
   const data = await response.json();
   console.log('Chat response data:', data);
+  return data;
+}
+
+/**
+ * Clear session data including blob storage files
+ */
+export async function clearSession(uniqueId) {
+  console.log('Clearing session data for unique_id:', uniqueId);
+  
+  const response = await fetch(buildUrl('/clearSession'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      unique_id: uniqueId,
+      event_type: 'clearSession',
+    }),
+  });
+
+  console.log('Clear session response status:', response.status);
+
+  if (!response.ok) {
+    handleAuthError(response);
+    const errorText = await response.text();
+    console.error('Clear session error response:', errorText);
+    // Don't throw error - deletion is best effort
+    console.warn('Failed to clear session, but continuing...');
+    return { success: false };
+  }
+
+  const data = await response.json();
+  console.log('Clear session response data:', data);
   return data;
 }
 
