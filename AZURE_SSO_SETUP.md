@@ -18,7 +18,7 @@ Open the `.env` file and replace the placeholder values with your actual Azure A
 ```env
 REACT_APP_AZURE_AD_CLIENT_ID=your-actual-client-id
 REACT_APP_AZURE_AD_TENANT_ID=your-actual-tenant-id
-REACT_APP_AZURE_AD_REDIRECT_URI=http://localhost:3000
+REACT_APP_AZURE_AD_REDIRECT_URI_DEV=http://localhost:3000
 ```
 
 ### 2. Configure Azure AD App Registration
@@ -62,7 +62,7 @@ When deploying to production (Azure Static Web Apps):
    ```env
    REACT_APP_AZURE_AD_CLIENT_ID=your-actual-client-id
    REACT_APP_AZURE_AD_TENANT_ID=your-actual-tenant-id
-   REACT_APP_AZURE_AD_REDIRECT_URI=https://your-production-url.azurewebsites.net
+   REACT_APP_AZURE_AD_REDIRECT_URI_DEV=https://your-production-url.azurewebsites.net
    ```
 
 2. Add the production URL to your Azure AD App Registration redirect URIs

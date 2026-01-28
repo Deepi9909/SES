@@ -6,7 +6,7 @@ Update the `.env` file with these values:
 ```env
 REACT_APP_AZURE_AD_CLIENT_ID=<paste-your-client-id>
 REACT_APP_AZURE_AD_TENANT_ID=<paste-your-tenant-id>
-REACT_APP_AZURE_AD_REDIRECT_URI=http://localhost:3000
+REACT_APP_AZURE_AD_REDIRECT_URI_DEV=http://localhost:3000
 ```
 
 ## Azure Portal Configuration Checklist
@@ -38,5 +38,5 @@ REACT_APP_AZURE_AD_REDIRECT_URI=http://localhost:3000
 When deploying to Azure Static Web Apps or other hosting:
 1. Set environment variable: `REACT_APP_AZURE_AD_CLIENT_ID`
 2. Set environment variable: `REACT_APP_AZURE_AD_TENANT_ID`
-3. Set environment variable: `REACT_APP_AZURE_AD_REDIRECT_URI` (production URL)
+3. Set environment variable: `REACT_APP_AZURE_AD_REDIRECT_URI_DEV` (production URL)
 4. Add production URL to Azure AD redirect URIs
