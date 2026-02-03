@@ -1,5 +1,5 @@
 // API Base URL - loaded from environment variable
-const API_BASE_URL = 'https://fnc-vmp-weu1-d-030-fnekhxd8g7c5hdhs.westeurope-01.azurewebsites.net/api/vmp_agent';
+const API_BASE_URL = 'https://fnc-vmp-weu1-d-033-fkhpc3bye5hdd5gp.westeurope-01.azurewebsites.net/api/vmp_agent';
 
 
 
