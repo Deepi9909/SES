@@ -19,10 +19,13 @@ export async function loadRuntimeConfig() {
     const tenantId = config.azureAd.tenantId?.replace(/{{|}}/g, '').trim();
     const redirectUri = config.azureAd.redirectUri?.replace(/{{|}}/g, '').trim();
     
+    const apiBaseUrl = config.api?.baseUrl?.replace(/{{|}}/g, '').trim();
+    
     configCache = {
       clientId: clientId || process.env.REACT_APP_AZURE_AD_CLIENT_ID || '',
       tenantId: tenantId || process.env.REACT_APP_AZURE_AD_TENANT_ID || 'common',
       redirectUri: redirectUri || process.env.REACT_APP_AZURE_AD_REDIRECT_URI || window.location.origin,
+      apiBaseUrl: apiBaseUrl || process.env.REACT_APP_API_BASE_URL || '/api/vmp_agent',
     };
     
     return configCache;
@@ -34,6 +37,7 @@ export async function loadRuntimeConfig() {
       clientId: process.env.REACT_APP_AZURE_AD_CLIENT_ID || '',
       tenantId: process.env.REACT_APP_AZURE_AD_TENANT_ID || 'common',
       redirectUri: process.env.REACT_APP_AZURE_AD_REDIRECT_URI || window.location.origin,
+      apiBaseUrl: process.env.REACT_APP_API_BASE_URL || '/api/vmp_agent',
     };
     
     return configCache;
