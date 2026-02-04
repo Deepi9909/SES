@@ -2,6 +2,6 @@
   "azureAd": {
     "clientId": "9d19a3fb-5c37-4bcf-a33b-acdb666de37b",
     "tenantId": "88281ca8-e525-4a8d-b965-480a7ac2b970",
-    "redirectUri": "https://wa-vmp-weu1-d-031-hwckddfucqgtddg7.westeurope-01.azurewebsites.net"
+    "redirectUri": "https://wa-vmp-weu1-d-030-bhhtdcd8dtfffjfu.westeurope-01.azurewebsites.net"
   }
 }
