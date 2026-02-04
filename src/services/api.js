@@ -1,5 +1,5 @@
 // API Base URL - loaded from environment variable
-const API_BASE_URL = process.env.REACT_APP_API_URL_DEV;
+const API_BASE_URL = '/api/vmp_func_app';
 
 
 
