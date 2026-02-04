@@ -10,14 +10,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Proxy endpoint - forwards requests to Function App via private endpoint
-app.post('/api/vmp_func_app', async (req, res) => {
+app.post('/api/vmp_agent', async (req, res) => {
   try {
     console.log('Proxying request to Function App');
     console.log('Event type:', req.body.event_type);
     
     // Forward the request to Function App
     const response = await axios.post(
-      'https://fnc-vmp-weu1-p-001-f7bmd9cze3had9hv.westeurope-01.azurewebsites.net/api/vmp_func_app',
+      'https://fnc-vmp-weu1-d-033-fkhpc3bye5hdd5gp.westeurope-01.azurewebsites.net/api/vmp_agent',
       req.body,
       {
         headers: {

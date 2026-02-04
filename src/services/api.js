@@ -1,12 +1,5 @@
-// API Base URL - loaded from environment variable
-const API_BASE_URL = '/api/vmp_func_app';
-
-
-
-
-if (!API_BASE_URL) {
-  console.error('REACT_APP_API_URL_DEV is not set in environment variables');
-}
+// API Base URL - calls local proxy server which forwards to backend via private endpoint
+const API_BASE_URL = '/api/vmp_agent';
 
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
@@ -115,6 +108,13 @@ export async function getUploadUrl(fileName, contentType, uniqueId = null, pathP
     const errorText = await response.text();
     console.error('Error response:', errorText);
     throw new Error('Failed to get upload URL');
+  }
+
+  // Check if response is HTML instead of JSON (common when auth fails)
+  const responseContentType = response.headers.get('content-type');
+  if (responseContentType && responseContentType.includes('text/html')) {
+    console.error('Received HTML response instead of JSON - likely authentication issue');
+    throw new Error('Authentication failed. Please log in again.');
   }
 
   const data = await response.json();
