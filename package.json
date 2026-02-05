@@ -4,21 +4,28 @@
   "private": true,
   "description": "Enterprise Contract Management System UI built with React and Tailwind CSS",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server.js",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=false --passWithNoTests",
+    "test": "react-scripts test --passWithNoTests",
     "eject": "react-scripts eject"
   },
   "dependencies": {
     "@azure/msal-browser": "^4.27.0",
     "@azure/msal-react": "^3.0.23",
     "@azure/storage-blob": "^12.29.1",
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.3"
@@ -27,5 +34,6 @@
     ">0.2%",
     "not dead",
     "not op_mini all"
-  ]
+  ],
+  "proxy": "https://fnc-vmp-weu1-d-033-fkhpc3bye5hdd5gp.westeurope-01.azurewebsites.net"
 }

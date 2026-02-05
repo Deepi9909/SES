@@ -1,11 +1,5 @@
-// API Base URL - loaded from environment variable
-const API_BASE_URL = process.env.REACT_APP_API_URL_DEV;
-
-
-
-if (!API_BASE_URL) {
-  console.error('REACT_APP_API_URL_DEV is not set in environment variables');
-}
+// API Base URL - calls local proxy server which forwards to backend via private endpoint
+const API_BASE_URL = '/api/vmp_agent';
 
 // Helper function to build API endpoint URL
 function buildUrl(endpoint) {
@@ -16,23 +10,13 @@ function buildUrl(endpoint) {
 
 // Helper function to get authentication headers
 function getAuthHeaders() {
-  const token = localStorage.getItem('authToken');
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
   
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-    console.log('=== TOKEN DEBUG ===');
-    console.log('Full token from localStorage:', token);
-    console.log('Token length:', token.length);
-    console.log('Token parts (should be 3):', token.split('.').length);
-    console.log('Authorization header:', headers['Authorization']);
-    console.log('Header length:', headers['Authorization'].length);
-  } else {
-    console.warn('No auth token found in localStorage');
-  }
+  // Don't send any authorization tokens - backend uses network-level security
+  console.log('API call - no auth token needed (using private endpoint security)');
   
   return headers;
 }
@@ -116,30 +100,38 @@ export async function getUploadUrl(fileName, contentType, uniqueId = null, pathP
     throw new Error('Failed to get upload URL');
   }
 
+  // Check if response is HTML instead of JSON (common when auth fails)
+  const responseContentType = response.headers.get('content-type');
+  if (responseContentType && responseContentType.includes('text/html')) {
+    console.error('Received HTML response instead of JSON - likely authentication issue');
+    throw new Error('Authentication failed. Please log in again.');
+  }
+
   const data = await response.json();
   console.log('Response data:', data);
   return data;
 }
 
 /**
- * Upload file directly to Azure Blob Storage using SAS URL
+ * Upload file to Azure Blob Storage via Web App proxy (for private endpoint)
  */
 export async function uploadToAzure(uploadUrl, file, contentType) {
-  const response = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'x-ms-blob-type': 'BlockBlob',
-      'Content-Type': contentType,
-    },
-    body: file,
+  const formData = new FormData();
+  formData.append('uploadUrl', uploadUrl);
+  formData.append('contentType', contentType);
+  formData.append('file', file);
+
+  const response = await fetch('/api/blob-upload', {
+    method: 'POST',
+    body: formData,
   });
 
   if (!response.ok) {
     throw new Error('Failed to upload file to Azure Blob Storage');
   }
 
-  // Return the blob URL without SAS token
-  return uploadUrl.split('?')[0];
+  const data = await response.json();
+  return data.blobUrl || uploadUrl.split('?')[0];
 }
 
 /**
