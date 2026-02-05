@@ -27,7 +27,7 @@ app.post('/api/vmp_agent', async (req, res) => {
             'Authorization': req.headers.authorization 
           })
         },
-        timeout: 60000 // 60 second timeout
+        timeout: 180000 // 180 second timeout for long-running compare operations
       }
     );
     

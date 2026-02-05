@@ -10,23 +10,13 @@ function buildUrl(endpoint) {
 
 // Helper function to get authentication headers
 function getAuthHeaders() {
-  const token = localStorage.getItem('authToken');
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
   
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-    console.log('=== TOKEN DEBUG ===');
-    console.log('Full token from localStorage:', token);
-    console.log('Token length:', token.length);
-    console.log('Token parts (should be 3):', token.split('.').length);
-    console.log('Authorization header:', headers['Authorization']);
-    console.log('Header length:', headers['Authorization'].length);
-  } else {
-    console.warn('No auth token found in localStorage');
-  }
+  // Don't send any authorization tokens - backend uses network-level security
+  console.log('API call - no auth token needed (using private endpoint security)');
   
   return headers;
 }
