@@ -1,10 +1,14 @@
 const express = require('express');
 const axios = require('axios');
+const multer = require('multer');
 const path = require('path');
 const app = express();
 
 // Enable JSON parsing
 app.use(express.json());
+
+// Multipart parser for file uploads
+const upload = multer();
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
@@ -50,6 +54,49 @@ app.post('/api/vmp_agent', async (req, res) => {
       console.error('Request setup error:', error.message);
       res.status(500).json({ error: 'Internal server error' });
     }
+  }
+});
+
+// Proxy upload to Azure Blob Storage via private endpoint
+app.post('/api/blob-upload', upload.single('file'), async (req, res) => {
+  try {
+    const { uploadUrl, contentType } = req.body;
+
+    if (!uploadUrl) {
+      return res.status(400).json({ error: 'Missing uploadUrl' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Missing file' });
+    }
+
+    const finalContentType = contentType || req.file.mimetype || 'application/octet-stream';
+
+    const response = await axios.put(uploadUrl, req.file.buffer, {
+      headers: {
+        'x-ms-blob-type': 'BlockBlob',
+        'Content-Type': finalContentType,
+      },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      timeout: 180000,
+    });
+
+    if (response.status < 200 || response.status >= 300) {
+      return res.status(response.status).json({ error: 'Blob upload failed' });
+    }
+
+    const blobUrl = uploadUrl.split('?')[0];
+    return res.json({ blobUrl });
+  } catch (error) {
+    console.error('Blob upload proxy error:', error.message);
+
+    if (error.response) {
+      console.error('Blob upload error response:', error.response.status, error.response.data);
+      return res.status(error.response.status).json({ error: 'Blob upload failed' });
+    }
+
+    return res.status(500).json({ error: 'Blob upload proxy failed' });
   }
 });
 

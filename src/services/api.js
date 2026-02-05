@@ -113,24 +113,25 @@ export async function getUploadUrl(fileName, contentType, uniqueId = null, pathP
 }
 
 /**
- * Upload file directly to Azure Blob Storage using SAS URL
+ * Upload file to Azure Blob Storage via Web App proxy (for private endpoint)
  */
 export async function uploadToAzure(uploadUrl, file, contentType) {
-  const response = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'x-ms-blob-type': 'BlockBlob',
-      'Content-Type': contentType,
-    },
-    body: file,
+  const formData = new FormData();
+  formData.append('uploadUrl', uploadUrl);
+  formData.append('contentType', contentType);
+  formData.append('file', file);
+
+  const response = await fetch('/api/blob-upload', {
+    method: 'POST',
+    body: formData,
   });
 
   if (!response.ok) {
     throw new Error('Failed to upload file to Azure Blob Storage');
   }
 
-  // Return the blob URL without SAS token
-  return uploadUrl.split('?')[0];
+  const data = await response.json();
+  return data.blobUrl || uploadUrl.split('?')[0];
 }
 
 /**
