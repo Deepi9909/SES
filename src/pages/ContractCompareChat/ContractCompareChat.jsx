@@ -174,7 +174,9 @@ export default function ContractCompareChat() {
     try {
       const result = await compareContracts(uniqueId, categoryFilter);
       console.log('Comparison result:', result);
+      console.log('Setting comparisonData with:', result);
       setComparisonData(result);
+      console.log('comparisonData state should be updated now');
     } catch (error) {
       console.error('Failed to compare contracts:', error);
       alert('Failed to compare contracts. Please try again. Error: ' + error.message);
@@ -416,7 +418,7 @@ export default function ContractCompareChat() {
           </div>
           
           <div className="mb-4">
-            <label className="mr-4">
+            <label className="mr-4">{
               <input
                 type="radio"
                 name="view"
@@ -440,7 +442,7 @@ export default function ContractCompareChat() {
           )}
           {comparisonData && !comparing && (
             <>
-              <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} categoryFilter={categoryFilter} />
+              <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} />
               <div className="flex gap-4 mt-6">
                 <button
                   className="bg-gray-100 text-indigo-700 px-4 py-2 rounded shadow hover:bg-indigo-50 transition"

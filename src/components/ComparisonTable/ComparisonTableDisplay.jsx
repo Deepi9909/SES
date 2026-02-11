@@ -1,4 +1,11 @@
-export default function ComparisonTableDisplay({ data, viewMode = 'detailed', categoryFilter = 'all' }) {
+export default function ComparisonTableDisplay({ data, viewMode = 'detailed' }) {
+  console.log('=== ComparisonTableDisplay Debug ===');
+  console.log('data:', data);
+  console.log('data exists?', !!data);
+  console.log('viewMode:', viewMode);
+  console.log('data.comparison_markdown exists?', data?.comparison_markdown ? 'YES' : 'NO');
+  console.log('=====================================');
+  
   if (!data) {
     return (
       <div className="bg-white rounded-lg shadow p-4 text-center text-gray-400">
@@ -37,9 +44,9 @@ export default function ComparisonTableDisplay({ data, viewMode = 'detailed', ca
       <div className="bg-white rounded-lg shadow p-4 overflow-x-auto space-y-6">
         {sections.map((section, idx) => {
           if (section.includes('📄 Table 1')) {
-            return <MarkdownTable key={idx} content={section} title="Clause-Level Comparison" categoryFilter={categoryFilter} />;
+            return <MarkdownTable key={idx} content={section} title="Clause-Level Comparison" />;
           } else if (section.includes('📊 Table 2')) {
-            return <MarkdownTable key={idx} content={section} title="Product & Unit Price Comparison" categoryFilter={categoryFilter} />;
+            return <MarkdownTable key={idx} content={section} title="Product & Unit Price Comparison" />;
           }
           return null;
         })}
@@ -55,7 +62,7 @@ export default function ComparisonTableDisplay({ data, viewMode = 'detailed', ca
 }
 
 // Component to render markdown table
-function MarkdownTable({ content, title, categoryFilter = 'all' }) {
+function MarkdownTable({ content, title }) {
   // Extract table content between | characters
   const lines = content.split('\n').filter(line => line.trim().startsWith('|'));
   
@@ -69,32 +76,9 @@ function MarkdownTable({ content, title, categoryFilter = 'all' }) {
 
   // Skip separator line (index 1)
   // Parse data rows
-  let dataRows = lines.slice(2).map(line => {
+  const dataRows = lines.slice(2).map(line => {
     return line.split('|').map(cell => cell.trim()).filter(cell => cell);
   });
-
-  // Apply category filter
-  if (categoryFilter !== 'all') {
-    const lowerCategory = categoryFilter.toLowerCase();
-    dataRows = dataRows.filter(row => {
-      // Check if row contains the category keyword
-      return row.some(cell => cell.toLowerCase().includes(lowerCategory));
-    });
-  }
-
-  // Show message if no rows match the filter
-  if (dataRows.length === 0 && categoryFilter !== 'all') {
-    return (
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">
-          {title === "Clause-Level Comparison" ? "📄" : "📊"} {title}
-        </h3>
-        <div className="text-center text-gray-400 py-4">
-          No results match the selected category
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="mb-8">
