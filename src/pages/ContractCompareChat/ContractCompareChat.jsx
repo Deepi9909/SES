@@ -19,6 +19,7 @@ export default function ContractCompareChat() {
   const [comparisonData, setComparisonData] = useState(null);
   const [viewMode, setViewMode] = useState('detailed');
   const [uniqueId, setUniqueId] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const fileInputRef = useRef();
 
   // Set initial mode based on navigation state
@@ -166,12 +167,12 @@ export default function ContractCompareChat() {
       return;
     }
 
-    console.log('Starting comparison with unique_id:', uniqueId);
+    console.log('Starting comparison with unique_id:', uniqueId, 'do_type:', categoryFilter);
     setComparing(true);
     setComparisonData(null);
 
     try {
-      const result = await compareContracts(uniqueId);
+      const result = await compareContracts(uniqueId, categoryFilter);
       console.log('Comparison result:', result);
       setComparisonData(result);
     } catch (error) {
@@ -364,6 +365,56 @@ export default function ContractCompareChat() {
               Clear All
             </button>
           </div>
+          
+          {/* Filter Section */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Filter by Category
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setCategoryFilter('all')}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  categoryFilter === 'all'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setCategoryFilter('product')}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  categoryFilter === 'product'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Product
+              </button>
+              <button
+                onClick={() => setCategoryFilter('project')}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  categoryFilter === 'project'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Project
+              </button>
+              <button
+                onClick={() => setCategoryFilter('service')}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  categoryFilter === 'service'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Service
+              </button>
+            </div>
+          </div>
+          
           <div className="mb-4">
             <label className="mr-4">
               <input
@@ -389,7 +440,7 @@ export default function ContractCompareChat() {
           )}
           {comparisonData && !comparing && (
             <>
-              <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} />
+              <ComparisonTableDisplay data={comparisonData} viewMode={viewMode} categoryFilter={categoryFilter} />
               <div className="flex gap-4 mt-6">
                 <button
                   className="bg-gray-100 text-indigo-700 px-4 py-2 rounded shadow hover:bg-indigo-50 transition"
