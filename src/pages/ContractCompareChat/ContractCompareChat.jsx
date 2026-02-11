@@ -167,7 +167,7 @@ export default function ContractCompareChat() {
       return;
     }
 
-    console.log('Starting comparison with unique_id:', uniqueId, 'do_type:', categoryFilter);
+    console.log('Starting comparison with unique_id:', uniqueId, 'doc_type:', categoryFilter);
     setComparing(true);
     setComparisonData(null);
 

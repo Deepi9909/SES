@@ -212,17 +212,16 @@ export async function clearSession(uniqueId) {
 }
 
 /**
- * Compare two contracts using unique_id, do_type, and doc_type
+ * Compare two contracts using unique_id and doc_type
  */
-export async function compareContracts(uniqueId, doType = 'all', docType = 'contract') {
-  console.log('Calling compareContracts API with unique_id:', uniqueId, 'do_type:', doType, 'doc_type:', docType);
+export async function compareContracts(uniqueId, docType = 'all') {
+  console.log('Calling compareContracts API with unique_id:', uniqueId, 'doc_type:', docType);
   
   const response = await fetch(buildUrl('/compareContracts'), {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({
       unique_id: uniqueId,
-      do_type: doType,
       doc_type: docType,
       event_type: 'compareContracts',
     }),
