@@ -5,6 +5,10 @@
   },
   "routes": [
     {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/*",
       "allowedRoles": ["anonymous"]
     }
@@ -14,5 +18,10 @@
       "rewrite": "/index.html",
       "statusCode": 200
     }
+  },
+  "environmentVariables": {
+    "AZURE_AD_CLIENT_ID": "",
+    "AZURE_AD_TENANT_ID": "",
+    "AZURE_AD_REDIRECT_URI": ""
   }
 }
