@@ -139,12 +139,22 @@ export async function uploadToAzure(uploadUrl, file, contentType) {
  */
 export async function uploadFile(file, uniqueId = null, pathPrefix = '') {
   console.log('uploadFile called with:', file.name, 'uniqueId:', uniqueId, 'pathPrefix:', pathPrefix);
-  const contentType = getContentType(file);
+  
+  // Add timestamp to filename to avoid conflicts
+  const timestamp = Date.now();
+  const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
+  const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'));
+  const uniqueFileName = `${fileNameWithoutExt}_${timestamp}${fileExtension}`;
+  
+  // Create a new File object with the unique name
+  const uniqueFile = new File([file], uniqueFileName, { type: file.type });
+  
+  const contentType = getContentType(uniqueFile);
   console.log('Content type:', contentType);
-  console.log('Calling getUploadUrl with:', { fileName: file.name, contentType, uniqueId, pathPrefix });
-  const { uploadUrl } = await getUploadUrl(file.name, contentType, uniqueId, pathPrefix);
+  console.log('Calling getUploadUrl with:', { fileName: uniqueFile.name, contentType, uniqueId, pathPrefix });
+  const { uploadUrl } = await getUploadUrl(uniqueFile.name, contentType, uniqueId, pathPrefix);
   console.log('Received uploadUrl:', uploadUrl);
-  const blobUrl = await uploadToAzure(uploadUrl, file, contentType);
+  const blobUrl = await uploadToAzure(uploadUrl, uniqueFile, contentType);
   console.log('Upload complete, blob URL:', blobUrl);
   return blobUrl;
 }
