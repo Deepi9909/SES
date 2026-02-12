@@ -299,63 +299,160 @@ export async function exportComparisonPDF(comparisonData) {
  */
 export function exportComparisonCSV(comparisonData) {
   // Generate CSV directly in frontend from comparison data
-  if (!comparisonData || !comparisonData.comparison_markdown) {
+  if (!comparisonData) {
     throw new Error('No comparison data available');
   }
 
-  const markdown = comparisonData.comparison_markdown;
   let csvContent = '';
 
-  // Extract tables from markdown
-  const lines = markdown.split('\n');
-  let currentTable = [];
-  let tableCount = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+  // Helper function to convert array of objects to CSV
+  const arrayToCSV = (dataArray, title) => {
+    if (!dataArray || dataArray.length === 0) return '';
     
-    // Check for table headers
-    if (line.includes('**📄 Table 1') || line.includes('**📊 Table 2')) {
-      // Save previous table if exists
-      if (currentTable.length > 0) {
-        if (tableCount > 0) csvContent += '\n\n';
-        csvContent += currentTable.join('\n');
-        tableCount++;
+    const rows = [];
+    
+    // Add table title
+    rows.push(title);
+    
+    // Extract headers from first object
+    const headers = Object.keys(dataArray[0]);
+    
+    // Add header row
+    const headerRow = headers.map(h => {
+      const formattedHeader = h.replace(/_/g, ' ');
+      if (formattedHeader.includes(',') || formattedHeader.includes('"')) {
+        return `"${formattedHeader.replace(/"/g, '""')}"`;
       }
-      currentTable = [];
-      
-      // Add table title
-      const title = line.includes('📄') ? 'Clause-Level Comparison' : 'Product & Unit Price Comparison';
-      currentTable.push(title);
-      continue;
-    }
-
-    // Process table rows
-    if (line.startsWith('|')) {
-      // Convert markdown table row to CSV
-      const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
-      
-      // Skip separator lines (contains only dashes)
-      if (cells.every(cell => /^[-:]+$/.test(cell))) {
-        continue;
-      }
-      
-      // Escape cells with commas or quotes
-      const csvCells = cells.map(cell => {
-        if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
-          return `"${cell.replace(/"/g, '""')}"`;
+      return formattedHeader;
+    });
+    rows.push(headerRow.join(','));
+    
+    // Add data rows
+    dataArray.forEach(obj => {
+      const rowValues = headers.map(header => {
+        const value = obj[header] || '';
+        const strValue = String(value);
+        
+        // Escape cells with commas, quotes, or newlines
+        if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n')) {
+          return `"${strValue.replace(/"/g, '""')}"`;
         }
-        return cell;
+        return strValue;
       });
+      rows.push(rowValues.join(','));
+    });
+    
+    return rows.join('\n');
+  };
+
+  // Helper function to parse markdown table to CSV (for backward compatibility)
+  const parseMarkdownTable = (markdown, title) => {
+    const lines = markdown.split('\n');
+    const tableRows = [];
+    
+    tableRows.push(title);
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
       
-      currentTable.push(csvCells.join(','));
+      if (line.startsWith('|')) {
+        const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
+        
+        if (cells.every(cell => /^[-:]+$/.test(cell))) {
+          continue;
+        }
+        
+        const csvCells = cells.map(cell => {
+          if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        });
+        
+        tableRows.push(csvCells.join(','));
+      }
+    }
+    
+    return tableRows.join('\n');
+  };
+
+  // New format: table1 and table2 as arrays of objects
+  if (Array.isArray(comparisonData.table1) || Array.isArray(comparisonData.table2)) {
+    if (Array.isArray(comparisonData.table1) && comparisonData.table1.length > 0) {
+      csvContent += arrayToCSV(comparisonData.table1, 'Clause-Level Comparison');
+    }
+    
+    if (Array.isArray(comparisonData.table2) && comparisonData.table2.length > 0) {
+      if (csvContent) csvContent += '\n\n';
+      csvContent += arrayToCSV(comparisonData.table2, 'Product & Unit Price Comparison');
     }
   }
+  // Fallback for markdown string format
+  else if (typeof comparisonData.table1 === 'string' || typeof comparisonData.table2 === 'string') {
+    if (comparisonData.table1) {
+      csvContent += parseMarkdownTable(comparisonData.table1, 'Clause-Level Comparison');
+    }
+    
+    if (comparisonData.table2) {
+      if (csvContent) csvContent += '\n\n';
+      csvContent += parseMarkdownTable(comparisonData.table2, 'Product & Unit Price Comparison');
+    }
+  }
+  // Fallback for old format (comparison_markdown field)
+  else if (comparisonData.comparison_markdown) {
+    const markdown = comparisonData.comparison_markdown;
+    const lines = markdown.split('\n');
+    let currentTable = [];
+    let tableCount = 0;
 
-  // Add last table
-  if (currentTable.length > 0) {
-    if (tableCount > 0) csvContent += '\n\n';
-    csvContent += currentTable.join('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Check for table headers
+      if (line.includes('**📄 Table 1') || line.includes('**📊 Table 2')) {
+        // Save previous table if exists
+        if (currentTable.length > 0) {
+          if (tableCount > 0) csvContent += '\n\n';
+          csvContent += currentTable.join('\n');
+          tableCount++;
+        }
+        currentTable = [];
+        
+        // Add table title
+        const title = line.includes('📄') ? 'Clause-Level Comparison' : 'Product & Unit Price Comparison';
+        currentTable.push(title);
+        continue;
+      }
+
+      // Process table rows
+      if (line.startsWith('|')) {
+        // Convert markdown table row to CSV
+        const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
+        
+        // Skip separator lines (contains only dashes)
+        if (cells.every(cell => /^[-:]+$/.test(cell))) {
+          continue;
+        }
+        
+        // Escape cells with commas or quotes
+        const csvCells = cells.map(cell => {
+          if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        });
+        
+        currentTable.push(csvCells.join(','));
+      }
+    }
+
+    // Add last table
+    if (currentTable.length > 0) {
+      if (tableCount > 0) csvContent += '\n\n';
+      csvContent += currentTable.join('\n');
+    }
+  } else {
+    throw new Error('No comparison data available');
   }
 
   // Add summary if exists

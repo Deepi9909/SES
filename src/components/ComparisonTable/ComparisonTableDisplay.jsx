@@ -3,7 +3,8 @@ export default function ComparisonTableDisplay({ data, viewMode = 'detailed' }) 
   console.log('data:', data);
   console.log('data exists?', !!data);
   console.log('viewMode:', viewMode);
-  console.log('data.comparison_markdown exists?', data?.comparison_markdown ? 'YES' : 'NO');
+  console.log('data.table1 type:', Array.isArray(data?.table1) ? 'Array' : typeof data?.table1);
+  console.log('data.table2 type:', Array.isArray(data?.table2) ? 'Array' : typeof data?.table2);
   console.log('=====================================');
   
   if (!data) {
@@ -32,12 +33,37 @@ export default function ComparisonTableDisplay({ data, viewMode = 'detailed' }) 
     );
   }
 
-  // If backend returns markdown (comparison_markdown field)
+  // New format: backend returns table1 and table2 as arrays of objects
+  if (Array.isArray(data.table1) || Array.isArray(data.table2)) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4 overflow-x-auto space-y-6">
+        {Array.isArray(data.table1) && data.table1.length > 0 && (
+          <ObjectArrayTable data={data.table1} title="Clause-Level Comparison" icon="📄" />
+        )}
+        {Array.isArray(data.table2) && data.table2.length > 0 && (
+          <ObjectArrayTable data={data.table2} title="Product & Unit Price Comparison" icon="📊" />
+        )}
+      </div>
+    );
+  }
+
+  // Fallback for old markdown format
+  if (typeof data.table1 === 'string' || typeof data.table2 === 'string') {
+    return (
+      <div className="bg-white rounded-lg shadow p-4 overflow-x-auto space-y-6">
+        {data.table1 && typeof data.table1 === 'string' && (
+          <MarkdownTable content={data.table1} title="Clause-Level Comparison" />
+        )}
+        {data.table2 && typeof data.table2 === 'string' && (
+          <MarkdownTable content={data.table2} title="Product & Unit Price Comparison" />
+        )}
+      </div>
+    );
+  }
+
+  // Fallback for old comparison_markdown format
   if (data.comparison_markdown) {
-    // Parse markdown to extract tables
     const markdown = data.comparison_markdown;
-    
-    // Split by table headers to separate Table 1 and Table 2
     const sections = markdown.split(/(?=\*\*📄 Table|\*\*📊 Table)/);
     
     return (
@@ -57,6 +83,81 @@ export default function ComparisonTableDisplay({ data, viewMode = 'detailed' }) 
   return (
     <div className="bg-white rounded-lg shadow p-4 text-center text-gray-400">
       No comparison data available.
+    </div>
+  );
+}
+
+// Component to render array of objects as a table
+function ObjectArrayTable({ data, title, icon }) {
+  if (!data || data.length === 0) {
+    return <div className="text-gray-400">No data available</div>;
+  }
+
+  // Extract headers from the first object's keys
+  const headers = Object.keys(data[0]);
+
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-semibold mb-3 text-gray-800">
+        {icon} {title}
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-xs border border-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              {headers.map((header, idx) => (
+                <th
+                  key={idx}
+                  className="px-3 py-2 text-left font-semibold text-gray-700 border-b border-gray-300"
+                >
+                  {header.replace(/_/g, ' ')}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, rowIdx) => (
+              <tr
+                key={rowIdx}
+                className={`${rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}
+              >
+                {headers.map((header, cellIdx) => {
+                  const cellValue = row[header] || '-';
+                  let cellClass = 'px-3 py-2 border-b border-gray-200';
+                  
+                  // Highlight based on comparison summary or cell content
+                  if (typeof cellValue === 'string') {
+                    const lowerValue = cellValue.toLowerCase();
+                    
+                    if (lowerValue.includes('different') || 
+                        lowerValue.includes('modified') ||
+                        lowerValue.includes('mismatch') ||
+                        lowerValue.includes('removed') ||
+                        lowerValue.includes('missing') ||
+                        lowerValue.includes('added')) {
+                      cellClass += ' text-red-600 font-medium';
+                    } else if (lowerValue.includes('identical') || 
+                               lowerValue.includes('same') ||
+                               lowerValue.includes('match')) {
+                      cellClass += ' text-green-600 font-medium';
+                    } else if (cellValue.includes('%') && cellValue.includes('-')) {
+                      cellClass += ' text-red-600 font-semibold';
+                    } else if (cellValue.includes('%') && !cellValue.includes('-')) {
+                      cellClass += ' text-green-600 font-semibold';
+                    }
+                  }
+                  
+                  return (
+                    <td key={cellIdx} className={cellClass}>
+                      {cellValue}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
