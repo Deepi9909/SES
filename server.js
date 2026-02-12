@@ -72,10 +72,13 @@ app.post('/api/blob-upload', upload.single('file'), async (req, res) => {
 
     const finalContentType = contentType || req.file.mimetype || 'application/octet-stream';
 
+    console.log('Uploading to Azure Blob Storage:', uploadUrl.split('?')[0]);
+
     const response = await axios.put(uploadUrl, req.file.buffer, {
       headers: {
         'x-ms-blob-type': 'BlockBlob',
         'Content-Type': finalContentType,
+        'x-ms-blob-content-disposition': 'inline',
       },
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
